@@ -144,6 +144,7 @@ class App {
         inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = '';
     }
 
+
     _renderWorkoutMarker(workout) {
         L.marker(workout.coords)
             .addTo(this.#map)
@@ -154,8 +155,9 @@ class App {
                     autoClose: false,
                     closeOnClick: false,
                     className: `${workout.type}-popup`
-                }).setContent(`${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.distance} km`)
+                }).setContent(`${workout.type === 'running' ? 'Running' : 'Cycling'} ${workout.distance} km`)
             )
+           
             .openPopup();
     }
 }
