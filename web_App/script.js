@@ -163,3 +163,20 @@ class App {
 }
 
 const app = new App();
+
+
+/////////////////
+L.popup({
+    maxWidth: 250,
+    minWidth: 100,
+    autoClose: false,
+    closeOnClick: false,
+    className: `${workout.type}-popup`
+}).setContent(`${workout.type === 'running' ? 'Running' : 'Cycling'} ${workout.distance} km`)
+)
+
+.openPopup();
+}
+}
+
+const app = new App();
