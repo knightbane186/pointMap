@@ -1,7 +1,6 @@
 'use strict';
 
-// prettier-ignore
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
 
 class Workout {
     date = new Date();
@@ -11,6 +10,12 @@ class Workout {
         this.coords = coords; // [lat, lng]
         this.distance = distance; // in km
         this.duration = duration; // in min
+      
+    }
+    _setDescription(){
+// prettier-ignore
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+this.description = `${this.type[0].toUppercase()}${this.type.slice(1)} on ${months[this.date.getMonth()]}${this.date.getDate()}`;
     }
 }
 
@@ -37,6 +42,7 @@ class Cycling extends Workout {
         super(coords, distance, duration);
         this.elevationGain = elevationGain;
         this.calcSpeed();
+        this._setDescription();
     }
 
     calcSpeed() {
@@ -160,23 +166,22 @@ class App {
            
             .openPopup();
     }
-}
-
-const app = new App();
-
-
-/////////////////
-L.popup({
-    maxWidth: 250,
-    minWidth: 100,
-    autoClose: false,
-    closeOnClick: false,
-    className: `${workout.type}-popup`
-}).setContent(`${workout.type === 'running' ? 'Running' : 'Cycling'} ${workout.distance} km`)
-)
-
-.openPopup();
-}
+    _renderWorkout(workout){
+        const html = `
+        <li class="workout workout--${workout.type}" data-id="${workout.id}">
+          <h2 class="workout__title">${workout.description}</h2>
+          <div class="workout__details">
+            <span class="workout__icon">${workout.type === 'running'? '🏃‍♂️':'🚴‍♀️'}</span>
+            <span class="workout__value">${workout.distance}</span>
+            <span class="workout__unit">km</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">⏱</span>
+            <span class="workout__value">${workout.duration}</span>
+            <span class="workout__unit">min</span>
+          </div>
+        `
+    }
 }
 
 const app = new App();
