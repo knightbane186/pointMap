@@ -12,8 +12,10 @@ class Workout {
     }
 
     _setDescription() {
-        // prettier-ignore
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
         this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
     }
 }
@@ -65,6 +67,7 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 class App {
     #map;
+    #mapZoomLevel = 13;
     #mapEvent;
     #workouts = [];
 
@@ -72,6 +75,7 @@ class App {
         this._getPosition();
         form.addEventListener('submit', this._newWorkout.bind(this));
         inputType.addEventListener('change', this._toggleElevationField.bind(this));
+        containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
     }
 
     _getPosition() {
@@ -87,9 +91,8 @@ class App {
 
     _loadMap(position) {
         const { latitude, longitude } = position.coords;
-        console.log(`https://www.google.com.au/maps/@${latitude},${longitude}`);
         const coords = [latitude, longitude];
-        this.#map = L.map('map').setView(coords, 13);
+        this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
         L.tileLayer('https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -104,9 +107,6 @@ class App {
         form.classList.remove('hidden');
         inputDistance.focus();
     }
-
- 
-
 
     _toggleElevationField() {
         inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
@@ -150,9 +150,10 @@ class App {
         this._renderWorkout(workout);
 
         // Hide form + clear input fields
-        form.style.display ='none';
+        form.style.display = 'none';
         form.classList.add('hidden');
         inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = '';
+        setTimeout(() => (form.style.display = 'grid'), 1000);
     }
 
     _renderWorkoutMarker(workout) {
@@ -167,7 +168,7 @@ class App {
                     className: `${workout.type}-popup`
                 }).setContent(`${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.distance} km`)
             )
-            .setPopupContent(`${workout.type === 'running' ? '🏃‍♂️':'🚴‍♀️'} ${workout.description}`)
+            .setPopupContent(`${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`)
             .openPopup();
     }
 
@@ -216,6 +217,20 @@ class App {
           </li>`;
 
         form.insertAdjacentHTML('afterend', html);
+    }
+
+    _moveToPopup(e) {
+        const workoutEl = e.target.closest('.workout');
+        if (!workoutEl) return;
+
+        const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id);
+
+        this.#map.setView(workout.coords, this.#mapZoomLevel, {
+            animate: true,
+            pan: {
+                duration: 1,
+            }
+        });
     }
 }
 
